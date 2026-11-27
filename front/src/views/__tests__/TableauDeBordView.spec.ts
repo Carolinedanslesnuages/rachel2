@@ -23,11 +23,65 @@ describe('Tableau de bord', () => {
     vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => reponseJson(TABLEAU_ESSAI)))
     const wrapper = await monter()
     expect(wrapper.find('h1').text()).toBe('RACHEL2')
-    const cartes = wrapper.findAll('.chiffres li').map((carte) => carte.findAll('p').map((ligne) => ligne.text().replace(/\s/g, ' ')))
+    const cartes = wrapper.find('section').findAll('.chiffres li').map((carte) => carte.findAll('p').map((ligne) => ligne.text().replace(/\s/g, ' ')))
     expect(cartes).toEqual([
       ['1 250', 'Demandes reçues — octobre 2026', '+12 % par rapport au mois précédent'],
       ['90', 'Demandes traitées — octobre 2026', 'Pas de comparaison possible'],
     ])
+    wrapper.unmount()
+  })
+
+  it('affiche quatre sections, une par domaine, sous un seul titre principal', async () => {
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => reponseJson(TABLEAU_ESSAI)))
+    const wrapper = await monter()
+    expect(wrapper.findAll('h1')).toHaveLength(1)
+    expect(wrapper.findAll('section > h2').map((titre) => titre.text())).toEqual([
+      'Économie',
+      'Énergie',
+      'Écosystèmes',
+      'Climat et environnement',
+    ])
+    wrapper.unmount()
+  })
+
+  it('propose l’Hexagone, l’Outre-mer et les 18 régions dans un filtre étiqueté', async () => {
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => reponseJson(TABLEAU_ESSAI)))
+    const wrapper = await monter()
+    expect(wrapper.find('label').text()).toContain('Territoire')
+    const options = wrapper
+      .findAll('select option')
+      .map((option) => option.text())
+      .filter((texte) => texte !== 'Sélectionner une option')
+    expect(options).toHaveLength(20)
+    expect(options.slice(0, 2)).toEqual(['Hexagone', 'Outre-mer'])
+    expect(options).toContain('Bretagne')
+    wrapper.unmount()
+  })
+
+  it('recharge les indicateurs et annonce le territoire quand on change de filtre', async () => {
+    const appel = vi.fn<typeof fetch>(async () => reponseJson(TABLEAU_ESSAI))
+    vi.stubGlobal('fetch', appel)
+    const wrapper = await monter()
+    await wrapper.find('select').setValue('bretagne')
+    await flushPromises()
+    expect(appel).toHaveBeenLastCalledWith('/api/indicateurs?territoire=bretagne', expect.anything())
+    expect(wrapper.find('[role="status"]').text()).toBe('Indicateurs affichés pour le territoire : Bretagne.')
+    wrapper.unmount()
+  })
+
+  it('écrit « Donnée non disponible » quand un indicateur n’a pas de mesure pour le territoire', async () => {
+    const [economie, ...autres] = TABLEAU_ESSAI.sections
+    const sansMesure = {
+      sections: [
+        { ...economie!, series: [], chiffres: economie!.chiffres.map((chiffre) => ({ ...chiffre, valeur: null, evolution: null, periode: null })) },
+        ...autres,
+      ],
+    }
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>(async () => reponseJson(sansMesure)))
+    const wrapper = await monter()
+    expect(wrapper.findAll('.chiffres li')).toHaveLength(2)
+    expect(wrapper.text()).toContain('Donnée non disponible pour ce territoire')
+    expect(await violationsAccessibilite(document.body)).toEqual([])
     wrapper.unmount()
   })
 

@@ -7,7 +7,7 @@ import { nombre, periode } from '@/lib/format'
  * Graphique DSFR (<line-chart>, dessiné dans un canvas) et son alternative accessible : un
  * résumé en texte et le tableau des données (RGAA 1.6 : alternative à une image complexe).
  */
-const props = defineProps<{ serie: Serie; identifiant: string }>()
+const props = withDefaults(defineProps<{ serie: Serie; identifiant: string; titreTag?: 'h2' | 'h3' }>(), { titreTag: 'h2' })
 
 const tableauOuvert = ref(-1)
 const abscisses = computed(() => JSON.stringify(props.serie.courbes.map(() => props.serie.periodes.map(periode))))
@@ -30,7 +30,7 @@ const lignes = computed(() =>
 
 <template>
   <figure class="fr-mb-4w" :aria-labelledby="`${identifiant}-titre`">
-    <h2 :id="`${identifiant}-titre`" class="fr-h4">{{ serie.titre }}</h2>
+    <component :is="titreTag" :id="`${identifiant}-titre`" class="fr-h4">{{ serie.titre }}</component>
     <div class="graphique" aria-hidden="true">
       <line-chart :x="abscisses" :y="ordonnees" :name="noms" :unit-tooltip="serie.unite" />
     </div>

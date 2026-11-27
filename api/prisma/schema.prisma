@@ -12,15 +12,17 @@ datasource db {
   provider = "postgresql"
 }
 
-/// Une mesure d'un indicateur pour une période (ici : un mois). Les indicateurs du tableau de
-/// bord sont calculés à partir de ces mesures, côté serveur.
+/// Une mesure d'un indicateur pour un territoire et une période (ici : un mois). Les indicateurs
+/// du tableau de bord sont calculés à partir de ces mesures, côté serveur.
 model Mesure {
   id         Int      @id @default(autoincrement())
   /// Identifiant de l'indicateur (minuscules et tirets), ex. demandes-recues.
   indicateur String
+  /// Identifiant du territoire (hexagone, outre-mer ou une des 18 régions), ex. ile-de-france.
+  territoire String
   /// Premier jour de la période mesurée.
   periode    DateTime @db.Date
   valeur     Int
 
-  @@unique([indicateur, periode])
+  @@unique([indicateur, territoire, periode])
 }

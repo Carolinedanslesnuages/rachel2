@@ -1,44 +1,48 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import GraphiqueAccessible from '@/components/GraphiqueAccessible.vue'
-import { evolution, nombre, periode } from '@/lib/format'
+import SectionDomaine from '@/components/SectionDomaine.vue'
+import { TERRITOIRES } from '@/lib/territoires'
 import { useIndicateursStore } from '@/stores/indicateurs'
 
 const magasin = useIndicateursStore()
-const { tableau, erreur } = storeToRefs(magasin)
+const { tableau, erreur, territoire } = storeToRefs(magasin)
+
+const optionsTerritoire = TERRITOIRES.map((choix) => ({ text: choix.libelle, value: choix.id }))
+const libelleTerritoire = computed(() => TERRITOIRES.find((choix) => choix.id === territoire.value)?.libelle ?? '')
+
+const messageStatut = computed(() => {
+  if (erreur.value) return ''
+  if (!tableau.value) return 'Chargement des indicateurs…'
+  return `Indicateurs affichés pour le territoire : ${libelleTerritoire.value}.`
+})
+
+function changerTerritoire(identifiant: string | number | undefined) {
+  const territoireChoisi = TERRITOIRES.find((choix) => choix.id === identifiant)
+  if (territoireChoisi) magasin.choisirTerritoire(territoireChoisi)
+}
+
 onMounted(() => magasin.charger())
 </script>
 
 <template>
   <h1>RACHEL2</h1>
   <p>Les indicateurs sont calculés à partir des mesures enregistrées (données fictives dans l’aperçu).</p>
+  <DsfrSelect
+    :model-value="territoire"
+    label="Territoire"
+    hint="Hexagone, Outre-mer ou une région"
+    :options="optionsTerritoire"
+    @update:model-value="changerTerritoire"
+  />
   <DsfrAlert v-if="erreur" type="error" title="Indicateurs indisponibles" title-tag="h2" :description="erreur" />
-  <p v-else-if="!tableau" role="status">Chargement des indicateurs…</p>
-  <template v-else>
-    <h2 class="fr-h4">Chiffres clés</h2>
-    <ul class="fr-grid-row fr-grid-row--gutters chiffres">
-      <li v-for="chiffre in tableau.chiffres" :key="chiffre.id" class="fr-col-12 fr-col-md-6 fr-col-lg-4">
-        <div class="fr-callout fr-mb-0 chiffres__carte">
-          <p class="fr-callout__title fr-h2 fr-mb-1v">{{ nombre(chiffre.valeur) }}</p>
-          <p class="fr-text--bold fr-mb-1v">{{ chiffre.libelle }} — {{ periode(chiffre.periode) }}</p>
-          <p class="fr-text--sm fr-mb-0">{{ evolution(chiffre.evolution) }}</p>
-        </div>
-      </li>
-    </ul>
-    <p v-if="tableau.series.length === 0" class="fr-mt-4w">Aucune mesure enregistrée pour l’instant.</p>
-    <div class="fr-mt-4w">
-      <GraphiqueAccessible v-for="(serie, rang) in tableau.series" :key="serie.titre" :serie="serie" :identifiant="`serie-${rang}`" />
-    </div>
+  <p role="status" class="fr-mt-2w">{{ messageStatut }}</p>
+  <template v-if="tableau && !erreur">
+    <SectionDomaine
+      v-for="(section, rang) in tableau.sections"
+      :key="section.domaine"
+      :section="section"
+      :identifiant="`domaine-${rang}`"
+    />
   </template>
 </template>
-
-<style scoped>
-.chiffres {
-  list-style: none;
-  padding: 0;
-}
-.chiffres__carte {
-  height: 100%;
-}
-</style>
