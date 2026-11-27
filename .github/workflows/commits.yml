@@ -1,0 +1,16 @@
+name: commits
+
+# Chaque commit de la PR suit Conventional Commits : workflow commun lint-commits de la Fabnum.
+# Le titre de la PR, qui devient le commit de main à la fusion, a son propre contrôle (titre-pr.yml).
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  commits:
+    name: Commits (Conventional Commits)
+    uses: dnum-mi/fabnum-cicd/.github/workflows/lint-commits.yml@fcdf649638c865c9b6fb85df12bf25fa9e89d8c6 # v0.25.5
+    permissions:
+      contents: read
+      pull-requests: read

@@ -1,0 +1,49 @@
+{
+  "type": "tableau-de-bord",
+  "personnaliser": [
+    "PROJET.md",
+    "README.md",
+    "AGENTS.md",
+    "api/README.md",
+    "docker-compose.yml",
+    "docs/adr/0001-choix-de-la-stack.md",
+    "docs/adr/README.md",
+    "front/index.html",
+    "front/src/App.vue",
+    "front/src/router/index.ts",
+    "front/src/views/TableauDeBordView.vue",
+    "front/src/views/__tests__/TableauDeBordView.spec.ts"
+  ],
+  "controlesRequis": [
+    "Anti-fuite (gitleaks) / Scan git history for leaked secrets",
+    "Commits (Conventional Commits) / Lint commit messages",
+    "Workflows (zizmor) / Audit workflows with zizmor",
+    "Configuration (Trivy) / Scan config files vulnerabilities",
+    "API (lint, tests, compilation)",
+    "Front (lint, types, tests dont accessibilité, compilation)",
+    "Accessibilité RGAA (pages construites)",
+    "Dépendances (paquet réel, version exacte, licence)",
+    "Titre de PR (Conventional Commits, semver)",
+    "Taille des fichiers (une responsabilité par fichier)"
+  ],
+  "controles": [
+    "cd /app/api && npm run lint && npm test && npm run test:e2e && npm run build",
+    "cd /app/front && npx oxlint . && npx eslint . && npm run type-check && npm run test:unit -- --run && npm run build-only"
+  ],
+  "apercu": {
+    "image": "node:24-bookworm",
+    "base": "postgres",
+    "npm": [
+      "api",
+      "front"
+    ],
+    "avant": [
+      "cd /app/api && npx prisma migrate deploy && npx prisma db execute --file prisma/donnees-fictives.sql"
+    ],
+    "arrierePlan": [
+      "cd /app/api && npm run start:dev"
+    ],
+    "principal": "cd /app/front && npx vite --host 0.0.0.0 --port 5173 --strictPort",
+    "port": 5173
+  }
+}

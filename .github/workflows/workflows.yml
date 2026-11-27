@@ -1,0 +1,17 @@
+name: workflows
+
+# Sécurité des workflows GitHub Actions (actions épinglées, jetons, injections) : workflow commun
+# scan-zizmor de la Fabnum.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: Workflows (zizmor)
+    uses: dnum-mi/fabnum-cicd/.github/workflows/scan-zizmor.yml@fcdf649638c865c9b6fb85df12bf25fa9e89d8c6 # v0.25.5
+    permissions:
+      contents: read

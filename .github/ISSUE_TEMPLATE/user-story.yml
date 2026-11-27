@@ -1,0 +1,40 @@
+name: User story
+description: Un besoin utilisateur, sur un seul écran ou un seul parcours (4 critères au maximum)
+labels: ["user-story"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une story = un besoin. Si vous avez besoin de plus de 4 critères, découpez en plusieurs stories.
+        Le titre de l'issue est le titre court de la story.
+  - type: input
+    id: role
+    attributes:
+      label: En tant que
+      description: Qui a ce besoin ?
+      placeholder: agent d'accueil
+    validations:
+      required: true
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Je veux
+      description: Ce que la personne veut pouvoir faire
+    validations:
+      required: true
+  - type: textarea
+    id: benefice
+    attributes:
+      label: Afin de
+      description: À quoi ça lui sert
+    validations:
+      required: true
+  - type: textarea
+    id: criteres
+    attributes:
+      label: Critères d'acceptation
+      description: Un critère par ligne, commençant par « - ». 4 au maximum.
+      value: |
+        - 
+    validations:
+      required: true

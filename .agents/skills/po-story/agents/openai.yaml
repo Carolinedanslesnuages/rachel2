@@ -1,0 +1,3 @@
+# Codex ignore `disable-model-invocation` : ce fichier y interdit l'invocation implicite.
+policy:
+  allow_implicit_invocation: false

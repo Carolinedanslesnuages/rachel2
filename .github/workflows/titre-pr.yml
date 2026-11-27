@@ -1,0 +1,18 @@
+name: titre-pr
+
+# Fusion en squash : le titre de la PR devient le commit de main, que release-please lit pour
+# choisir la prochaine version (semver). Il doit donc suivre Conventional Commits 1.0.0.
+# Contrôle fourni par Constance, épinglé à une version.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  titre:
+    name: Titre de PR (Conventional Commits, semver)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Carolinedanslesnuages/constance/titre-pr@80a892e97ceed08494a8ef2ec2fd45993125c431 # v1.2.0

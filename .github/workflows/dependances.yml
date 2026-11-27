@@ -1,0 +1,20 @@
+name: dependances
+
+# Chaque dépendance npm ajoutée ou modifiée par la PR : paquet qui existe, version exacte et assez
+# ancienne, licence acceptée, pas dépréciée. Exceptions écrites et relues dans madeleine.json
+# (axe-core et le DSFR ont leur propre licence). Contrôle fourni par Madeleine, épinglé à une version.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dependances:
+    name: Dépendances (paquet réel, version exacte, licence)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: Carolinedanslesnuages/madeleine@d77cfe5a7d0b96919fad904aa13ddd54e8d91bbb # v1.1.0

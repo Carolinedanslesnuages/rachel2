@@ -1,0 +1,21 @@
+name: taille-fichiers
+
+# Un fichier, une responsabilité : un fichier de code ne dépasse pas 400 lignes non vides, un
+# fichier de test 600. Un fichier plus long venu d'avant (projet repris) est toléré tant qu'il ne
+# grossit pas : on le découpe quand on y travaille. Contrôle fourni par Constance, épinglé à une version.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  taille:
+    name: Taille des fichiers (une responsabilité par fichier)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: Carolinedanslesnuages/constance/taille-fichiers@80a892e97ceed08494a8ef2ec2fd45993125c431 # v1.2.0

@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Une mesure d'un indicateur pour une période (ici : un mois). Les indicateurs du tableau de
+/// bord sont calculés à partir de ces mesures, côté serveur.
+model Mesure {
+  id         Int      @id @default(autoincrement())
+  /// Identifiant de l'indicateur (minuscules et tirets), ex. demandes-recues.
+  indicateur String
+  /// Premier jour de la période mesurée.
+  periode    DateTime @db.Date
+  valeur     Int
+
+  @@unique([indicateur, periode])
+}

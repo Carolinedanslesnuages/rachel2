@@ -1,0 +1,20 @@
+name: anti-fuite
+
+# Aucun secret (clé, jeton, mot de passe) dans le dépôt : workflow commun scan-gitleaks de la
+# Fabnum (dnum-mi/fabnum-cicd), épinglé à une version et à son SHA. Il parcourt tout l'historique.
+# Faux positifs : .gitleaks.toml, lu par gitleaks.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  secrets:
+    name: Anti-fuite (gitleaks)
+    uses: dnum-mi/fabnum-cicd/.github/workflows/scan-gitleaks.yml@fcdf649638c865c9b6fb85df12bf25fa9e89d8c6 # v0.25.5
+    permissions:
+      contents: read
+      security-events: write
+      pull-requests: write

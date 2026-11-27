@@ -1,0 +1,6 @@
+{
+  "autorises": {
+    "axe-core": ["licence"],
+    "@gouvfr/dsfr": ["licence"]
+  }
+}

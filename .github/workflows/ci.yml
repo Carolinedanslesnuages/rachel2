@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (lint, tests, compilation)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:e2e
+      - run: npm run build
+
+  front:
+    name: Front (lint, types, tests dont accessibilité, compilation)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci
+      - run: npx oxlint .
+      - run: npx eslint .
+      - run: npm run type-check
+      - run: npm run test:unit -- --run
+      - run: npm run build-only
+
+  accessibilite:
+    name: Accessibilité RGAA (pages construites)
+    # Ubuntu 24.04 : le Playwright d'Emmanuelle ne prend pas encore en charge Ubuntu 26.04.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci
+        working-directory: front
+      - run: npm run build-only
+        working-directory: front
+      # Lien d'évitement, focus visible, 320 px, zoom, espacement du texte, axe-core : chaque constat
+      # rangé par critère du RGAA. Défauts connus et justifiés : .emmanuelle-reference.json.
+      - uses: Carolinedanslesnuages/emmanuelle@dd6ac2e0319b7f8b13c61d1af6b2c810dee0f485 # v1.1.0
+        with:
+          dossier: front/dist
+          pages: "/"
+          # Application monopage : chaque adresse de la liste reçoit index.html, comme chez l'hébergeur.
+          monopage: "true"

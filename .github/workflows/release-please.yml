@@ -1,0 +1,26 @@
+name: release-please
+
+# Versions par le workflow commun de la DNUM (dnum-mi/fabnum-cicd, release-app.yml), épinglé à
+# une version ET à son SHA : release-please, notes de version, tag et release GitHub.
+# Le PO publie depuis le panneau « Versions » d'ADA, qui fusionne la PR de version : pas
+# d'automerge ici. Sans identifiants de GitHub App, la PR de version est ouverte avec le jeton
+# du dépôt (voir docs/adr de l'outil : ADR-0005 et ADR-0007).
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  release:
+    uses: dnum-mi/fabnum-cicd/.github/workflows/release-app.yml@fcdf649638c865c9b6fb85df12bf25fa9e89d8c6 # v0.25.5
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    with:
+      ENABLE_PRERELEASE: false
+      TAG_MAJOR_AND_MINOR: false
+      AUTOMERGE_RELEASE: false
+      RELEASE_CONFIG_FILE: release-please-config.json
+      RELEASE_MANIFEST_FILE: .release-please-manifest.json

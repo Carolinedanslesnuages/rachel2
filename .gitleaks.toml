@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Badge d exemple du README généré par NestJS : faux jeton public, pas un secret"
+regexes = ['^abc123def456$']

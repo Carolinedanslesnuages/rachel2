@@ -1,0 +1,24 @@
+name: configuration
+
+# Mauvaises configurations (Dockerfile, chart Helm, Kubernetes…) : workflow commun scan-trivy de la
+# Fabnum, en mode configuration. Une faille de sévérité haute ou critique fait échouer le contrôle.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  trivy:
+    name: Configuration (Trivy)
+    uses: dnum-mi/fabnum-cicd/.github/workflows/scan-trivy.yml@fcdf649638c865c9b6fb85df12bf25fa9e89d8c6 # v0.25.5
+    permissions:
+      contents: read
+      security-events: write
+      packages: read
+      pull-requests: write
+    with:
+      PATH: ./
+      SEVERITY: HIGH,CRITICAL
+      FAIL_ON_ERROR: true
