@@ -15,4 +15,4 @@
 | Lancer le front | `cd front && npm run dev` |
 
 ## Stories réalisées
-_(aucune pour l'instant)_
+- #2 — Structure de l'observatoire et choix du territoire : quatre domaines et filtre de territoire (Hexagone, Outre-mer, 18 régions) partagé via le store.
